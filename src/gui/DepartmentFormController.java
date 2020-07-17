@@ -2,8 +2,11 @@ package gui;
 
 import java.awt.geom.IllegalPathStateException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
@@ -23,6 +26,8 @@ public class DepartmentFormController implements Initializable{
 	private Department entity;
 	
 	private DepartmentService service;
+	
+	private List<DataChangeListener> dataChangeListener = new ArrayList<>();
 	
 	@FXML
 	private TextField txtId;
@@ -59,6 +64,7 @@ public class DepartmentFormController implements Initializable{
 		try {
 			entity = getFormData();
 			service.saveOrUpdate(entity);
+			notifyDataChangeListeners();
 			Utils.currentStage(event).close();
 		} 
 		catch (Exception e) {
@@ -67,6 +73,14 @@ public class DepartmentFormController implements Initializable{
 		
 	}
 	
+	private void notifyDataChangeListeners() {
+		
+		for (DataChangeListener listener : dataChangeListener) {
+			listener.onDataChanged();
+		}
+		
+	}
+
 	// Pega os valores informados no formulário e coloca no objeto
 	private Department getFormData() {
 		Department obj = new Department();
@@ -86,6 +100,10 @@ public class DepartmentFormController implements Initializable{
 		initializeNodes();
 	}
 	
+	public void subscribeDataChangeListener(DataChangeListener listener) {
+		dataChangeListener.add(listener);
+	}
+	
 	private void initializeNodes() {
 		Constraints.setTextFieldInteger(txtId);
 		Constraints.setTextFieldMaxLength(txtName, 30);
@@ -100,3 +118,5 @@ public class DepartmentFormController implements Initializable{
 	}
 
 }
+
+

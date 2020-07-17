@@ -15,7 +15,7 @@ public class DepartmentService {
 	}
 	
 	//Busca todos os departamentos
-	/* MOKE
+	/* MOCK
 	public List<Department> findAll() {
 		List<Department> list = new ArrayList<>();
 		list.add(new Department(1, "Books"));

@@ -3,6 +3,7 @@ package gui;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import application.Main;
 import gui.util.Alerts;
@@ -16,6 +17,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import model.services.DepartmentService;
+import model.services.SellerService;
 
 public class MainViewController implements Initializable {
 
@@ -28,17 +30,23 @@ public class MainViewController implements Initializable {
 
 	@FXML
 	public void onMenuItemSellerAction() {
-		System.out.println("onMenuItemSellerAction");
+		loadView("/gui/SellerList.fxml", (SellerListController controller) -> {
+			controller.setSellerService(new SellerService());
+			controller.updateTableView();
+		}); 
 	}
 
 	@FXML
 	public void onMenuItemDepartmentAction() {
-		loadView2("/gui/DepartmentList.fxml");  
+		loadView("/gui/DepartmentList.fxml", (DepartmentListController controller) -> {
+			controller.setDepartmentService(new DepartmentService());
+			controller.updateTableView();
+		});  
 	}
 
 	@FXML
 	public void onMenuItemAboutAction() {
-		loadView("/gui/About.fxml");  
+		loadView("/gui/About.fxml", x -> {});  
 	}
 
 	@Override
@@ -46,7 +54,7 @@ public class MainViewController implements Initializable {
 
 	}
 	
-	private synchronized void loadView(String absolutName) {
+	private synchronized <T> void loadView(String absolutName, Consumer<T> initializingAction) {
 		
 		try {
 			
@@ -67,37 +75,8 @@ public class MainViewController implements Initializable {
 			// Adiciona o VBox da nova tela
 			mainVBox.getChildren().addAll(newVBox.getChildren());
 			
-		} catch (IOException e) {
-			
-			Alerts.showAlert("IOException", "Erro ao carregar a página", e.getMessage(), AlertType.ERROR);
-			
-		}
-	}
-	
-	private synchronized void loadView2(String absolutName) {
-		
-		try {
-			
-			FXMLLoader loader = new FXMLLoader(getClass().getResource(absolutName));
-			VBox newVBox = loader.load();
-			
-			// Pega a cena da tela principal
-			Scene mainScene = Main.getMainScene();
-			// Acessa o VBox da tela principal
-			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
-			
-			// Pega o menu principal
-			Node mainMenu = mainVBox.getChildren().get(0);
-			// Limpa todo VBox
-			mainVBox.getChildren().clear();
-			// Adiciona o menu
-			mainVBox.getChildren().add(mainMenu);
-			// Adiciona o VBox da nova tela
-			mainVBox.getChildren().addAll(newVBox.getChildren());
-			
-			DepartmentListController controller = loader.getController();
-			controller.setDepartmentService(new DepartmentService());
-			controller.updateTableView();
+			T controller = loader.getController();
+			initializingAction.accept(controller);
 			
 		} catch (IOException e) {
 			
@@ -105,6 +84,4 @@ public class MainViewController implements Initializable {
 			
 		}
 	}
-	
-
 }

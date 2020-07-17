@@ -61,6 +61,7 @@ public class DepartmentListController implements Initializable{
 	
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {	
+		// procedimento necessário para iniciar o comportamento das colunas.
 		initializeNodes();
 	}
 	

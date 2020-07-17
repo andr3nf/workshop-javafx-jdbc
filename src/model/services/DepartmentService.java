@@ -24,5 +24,14 @@ public class DepartmentService {
 		return list;
 		
 	}*/
+	
+	// Verifica se irá inserir um novo Departamento ou fazer um Update
+	public void saveOrUpdate(Department obj) {
+		if (obj.getId() == null) {
+			dao.insert(obj);
+		} else {
+			dao.update(obj);
+		}
+	}
 
 }
